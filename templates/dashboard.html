@@ -1,0 +1,211 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Teacher Dashboard -->
+    {% if role == 'teacher' %}
+    <div id="teacher-dashboard">
+        <!-- Tabs -->
+        <ul class="nav nav-pills mb-4 justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#create-quiz">
+                    <i class="fas fa-plus"></i> Create Quiz
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#manage-quizzes">
+                    <i class="fas fa-list"></i> Manage Quizzes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#view-results">
+                    <i class="fas fa-chart-bar"></i> View Results
+                </a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- Create Quiz Tab -->
+            <div class="tab-pane fade show active" id="create-quiz">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-plus-circle"></i> Create a New Quiz</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="quiz-form">
+                            <div class="mb-3">
+                                <label for="quiz-title" class="form-label">Quiz Title</label>
+                                <input type="text" class="form-control" id="quiz-title" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="quiz-description" class="form-label">Quiz Description</label>
+                                <textarea class="form-control" id="quiz-description" rows="2"></textarea>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div id="questions-container">
+                                <!-- Questions will be added here -->
+                            </div>
+                            
+                            <button type="button" class="btn btn-secondary" id="add-question-btn">
+                                <i class="fas fa-plus"></i> Add Question
+                            </button>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Quiz
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Manage Quizzes Tab -->
+            <div class="tab-pane fade" id="manage-quizzes">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list"></i> Manage Your Quizzes</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="teacher-quiz-list">
+                            <!-- Quizzes will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- View Results Tab -->
+            <div class="tab-pane fade" id="view-results">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-bar"></i> Quiz Results</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="results-container">
+                            <!-- Results will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Student Dashboard -->
+    {% if role == 'student' %}
+    <div id="student-dashboard">
+        <!-- Tabs -->
+        <ul class="nav nav-pills mb-4 justify-content-center">
+            <li class="nav-item">
+                <a class="nav-link active" data-bs-toggle="tab" href="#available-quizzes">
+                    <i class="fas fa-list"></i> Available Quizzes
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#take-quiz">
+                    <i class="fas fa-play"></i> Take Quiz
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" data-bs-toggle="tab" href="#my-results">
+                    <i class="fas fa-trophy"></i> My Results
+                </a>
+            </li>
+        </ul>
+        
+        <div class="tab-content">
+            <!-- Available Quizzes Tab -->
+            <div class="tab-pane fade show active" id="available-quizzes">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-list-ul"></i> Available Quizzes</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="student-quiz-list">
+                            <!-- Quizzes will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Take Quiz Tab -->
+            <div class="tab-pane fade" id="take-quiz">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="quiz-title-header">Take Quiz</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Progress Bar -->
+                        <div class="progress mb-4" style="height: 25px;">
+                            <div class="progress-bar" id="quiz-progress" role="progressbar" 
+                                 style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                                Question 0 of 0
+                            </div>
+                        </div>
+                        
+                        <!-- Quiz Content -->
+                        <div id="quiz-content">
+                            <div class="alert alert-info">
+                                Select a quiz from the Available Quizzes tab to begin
+                            </div>
+                        </div>
+                        
+                        <!-- Voice Listening Indicator -->
+                        <div id="listening-indicator" class="alert alert-info mt-3" style="display: none;">
+                            <i class="fas fa-microphone"></i> Listening for voice commands...
+                        </div>
+                        
+                        <!-- Voice Commands Info -->
+                        <div class="card mt-3 bg-light">
+                            <div class="card-body">
+                                <h5><i class="fas fa-microphone-alt"></i> Voice Commands</h5>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success"></i> "Repeat question"</li>
+                                            <li><i class="fas fa-check text-success"></i> "Repeat options"</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled">
+                                            <li><i class="fas fa-check text-success"></i> "Option A/B/C/D"</li>
+                                            <li><i class="fas fa-check text-success"></i> "Yes/No" to proceed</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- My Results Tab -->
+            <div class="tab-pane fade" id="my-results">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-trophy"></i> My Quiz Results</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="student-results-container">
+                            <!-- Results will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const USER_ROLE = "{{ role }}";
+</script>
+{% if role == 'teacher' %}
+<script src="{{ url_for('static', filename='js/teacher.js') }}"></script>
+{% else %}
+<script src="{{ url_for('static', filename='js/student.js') }}"></script>
+{% endif %}
+{% endblock %}

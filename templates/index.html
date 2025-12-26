@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg">
+                    <div class="card-header text-center bg-primary text-white py-4">
+                        <h1 class="mb-2"><i class="fas fa-graduation-cap"></i> Quiz Platform</h1>
+                        <p class="mb-0">Interactive voice-enabled quizzes for all students</p>
+                    </div>
+                    <div class="card-body p-4">
+                        <h3 class="text-center mb-4" id="auth-title">Welcome - Please Sign In</h3>
+                        
+                        <!-- Role Selection -->
+                        <div class="row mb-4" id="role-selection">
+                            <div class="col-6">
+                                <div class="role-card text-center p-3" data-role="teacher">
+                                    <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-3"></i>
+                                    <h5>Teacher</h5>
+                                    <p class="small text-muted">Create and manage quizzes</p>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="role-card text-center p-3" data-role="student">
+                                    <i class="fas fa-user-graduate fa-3x text-primary mb-3"></i>
+                                    <h5>Student</h5>
+                                    <p class="small text-muted">Take quizzes and view results</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Auth Form -->
+                        <form id="auth-form">
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="text" class="form-control" id="username" name="username" required>
+                            </div>
+                            
+                            <div class="mb-3" id="email-group" style="display: none;">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" name="password" required>
+                            </div>
+                            
+                            <div class="mb-3" id="confirm-password-group" style="display: none;">
+                                <label for="confirm-password" class="form-label">Confirm Password</label>
+                                <input type="password" class="form-control" id="confirm-password" name="confirm-password">
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary w-100" id="auth-submit-btn">
+                                <i class="fas fa-sign-in-alt"></i> Sign In
+                            </button>
+                        </form>
+                        
+                        <div class="text-center mt-3">
+                            <button type="button" class="btn btn-link" id="auth-toggle-btn">
+                                Don't have an account? Register here
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Demo Accounts Info -->
+                <div class="card mt-3 bg-light">
+                    <div class="card-body">
+                        <h6 class="card-title"><i class="fas fa-info-circle"></i> Demo Accounts</h6>
+                        <p class="small mb-0">
+                            <strong>Teacher:</strong> demo_teacher / demo123<br>
+                            <strong>Student:</strong> demo_student / demo123
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+{% endblock %}

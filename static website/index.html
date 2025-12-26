@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accessible Quiz Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="script.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="user-info" id="user-info">
+                <span class="user-badge" id="user-role"></span>
+                <span id="user-name"></span>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+            <h1>Accessible Quiz Platform</h1>
+            <p class="subtitle">Interactive voice-enabled quizzes for all students</p>
+        </header>
+        
+        <div class="content">
+            <!-- Authentication Section -->
+            <div id="auth-section">
+                <div class="login-form">
+                    <h2 id="auth-title">Welcome - Please Sign In</h2>
+                    
+                    <div id="auth-messages"></div>
+                    
+                    <form id="auth-form">
+                        <div class="role-selection" id="role-selection">
+                            <div class="role-card" data-role="teacher">
+                                <div class="role-icon">
+                                    <i class="fas fa-chalkboard-teacher"></i>
+                                </div>
+                                <div class="role-title">Teacher</div>
+                                <div class="role-description">Create and manage quizzes</div>
+                            </div>
+                            <div class="role-card" data-role="student">
+                                <div class="role-icon">
+                                    <i class="fas fa-user-graduate"></i>
+                                </div>
+                                <div class="role-title">Student</div>
+                                <div class="role-description">Take quizzes and view results</div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="username">Username:</label>
+                            <input type="text" id="username" name="username" placeholder="Enter your username" required aria-describedby="username-help">
+                            <small id="username-help">Your unique username for accessing the platform</small>
+                        </div>
+                        
+                        <div class="form-group" id="email-group" style="display: none;">
+                            <label for="email">Email:</label>
+                            <input type="email" id="email" name="email" placeholder="Enter your email address">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="password">Password:</label>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" required aria-describedby="password-help">
+                            <small id="password-help">Password must be at least 6 characters long</small>
+                        </div>
+                        
+                        <div class="form-group" id="confirm-password-group" style="display: none;">
+                            <label for="confirm-password">Confirm Password:</label>
+                            <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password">
+                        </div>
+                        
+                        <button type="submit" class="btn" id="auth-submit-btn">
+                            <i class="fas fa-sign-in-alt"></i> Sign In
+                        </button>
+                    </form>
+                    
+                    <div class="auth-toggle">
+                        <button type="button" id="auth-toggle-btn" onclick="toggleAuthMode()">
+                            Don't have an account? Register here
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Teacher Dashboard -->
+            <div id="teacher-dashboard" class="hidden">
+                <div class="tab-buttons">
+                    <button id="create-quiz-tab-btn" class="tab-btn active" onclick="switchTab('create-quiz')">
+                        <i class="fas fa-plus"></i> Create Quiz
+                    </button>
+                    <button id="manage-quiz-tab-btn" class="tab-btn" onclick="switchTab('manage-quiz')">
+                        <i class="fas fa-list"></i> Manage Quizzes
+                    </button>
+                    <button id="view-results-tab-btn" class="tab-btn" onclick="switchTab('view-results')">
+                        <i class="fas fa-chart-bar"></i> View Results
+                    </button>
+                </div>
+                
+                <!-- Create Quiz Tab -->
+                <div id="create-quiz-tab" class="tab-content active">
+                    <h2>Create a New Quiz</h2>
+                    <p>Design quiz questions with multiple-choice options for your students.</p>
+                    
+                    <form id="quiz-form">
+                        <div class="form-group">
+                            <label for="quiz-title">Quiz Title:</label>
+                            <input type="text" id="quiz-title" name="quiz-title" placeholder="Enter quiz title" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="quiz-description">Quiz Description:</label>
+                            <input type="text" id="quiz-description" name="quiz-description" placeholder="Brief description of the quiz">
+                        </div>
+                        
+                        <div id="question-container">
+                            <div class="form-group">
+                                <label for="question">Question 1:</label>
+                                <input type="text" id="question" name="question" placeholder="Enter your question" required>
+                                
+                                <label>Options:</label>
+                                <div class="options-grid">
+                                    <input type="text" name="option-a" placeholder="Option A" required>
+                                    <input type="text" name="option-b" placeholder="Option B" required>
+                                    <input type="text" name="option-c" placeholder="Option C" required>
+                                    <input type="text" name="option-d" placeholder="Option D" required>
+                                </div>
+                                
+                                <label for="correct-answer">Correct Answer:</label>
+                                <select id="correct-answer" name="correct-answer" required>
+                                    <option value="">Select correct answer</option>
+                                    <option value="A">Option A</option>
+                                    <option value="B">Option B</option>
+                                    <option value="C">Option C</option>
+                                    <option value="D">Option D</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button type="button" class="btn btn-secondary" id="add-question-btn">
+                            <i class="fas fa-plus"></i> Add Another Question
+                        </button>
+                        
+                        <button type="submit" class="btn">
+                            <i class="fas fa-save"></i> Save Quiz
+                        </button>
+                    </form>
+                    
+                    <div id="question-list">
+                        <h3>Quiz Preview</h3>
+                        <div id="quiz-preview"></div>
+                    </div>
+                </div>
+                
+                <!-- Manage Quizzes Tab -->
+                <div id="manage-quiz-tab" class="tab-content">
+                    <h2>Manage Your Quizzes</h2>
+                    <p>View, edit, and manage all your created quizzes.</p>
+                    
+                    <div id="teacher-quiz-list" class="quiz-list">
+                        <!-- Quizzes will be dynamically loaded here -->
+                    </div>
+                </div>
+                
+                <!-- View Results Tab -->
+                <div id="view-results-tab" class="tab-content">
+                    <h2>Quiz Results</h2>
+                    <p>View student performance and quiz statistics.</p>
+                    
+                    <div id="results-container">
+                        <!-- Results will be displayed here -->
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Student Dashboard -->
+            <div id="student-dashboard" class="hidden">
+                <div class="tab-buttons">
+                    <button id="available-quiz-tab-btn" class="tab-btn active" onclick="switchTab('available-quiz')">
+                        <i class="fas fa-list"></i> Available Quizzes
+                    </button>
+                    <button id="take-quiz-tab-btn" class="tab-btn" onclick="switchTab('take-quiz')">
+                        <i class="fas fa-play"></i> Take Quiz
+                    </button>
+                    <button id="my-results-tab-btn" class="tab-btn" onclick="switchTab('my-results')">
+                        <i class="fas fa-trophy"></i> My Results
+                    </button>
+                </div>
+                
+                <!-- Available Quizzes Tab -->
+                <div id="available-quiz-tab" class="tab-content active">
+                    <h2>Available Quizzes</h2>
+                    <p>Browse and select quizzes created by your teachers.</p>
+                    
+                    <div id="student-quiz-list" class="quiz-list">
+                        <!-- Available quizzes will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Take Quiz Tab -->
+                <div id="take-quiz-tab" class="tab-content">
+                    <h2>Take Quiz</h2>
+                    <p>Listen to questions and respond using voice commands or mouse clicks.</p>
+                    
+                    <div class="progress-container">
+                        <div class="progress-bar" id="quiz-progress"></div>
+                    </div>
+                    
+                    <div id="quiz-content">
+                        <div id="quiz-question">
+                            Select a quiz from the Available Quizzes tab to begin
+                        </div>
+                        
+                        <div class="quiz-options">
+                            <div class="option-item" data-option="A">
+                                <div class="option-letter">A</div>
+                                <div class="option-text">First option will appear here</div>
+                            </div>
+                            <div class="option-item" data-option="B">
+                                <div class="option-letter">B</div>
+                                <div class="option-text">Second option will appear here</div>
+                            </div>
+                            <div class="option-item" data-option="C">
+                                <div class="option-letter">C</div>
+                                <div class="option-text">Third option will appear here</div>
+                            </div>
+                            <div class="option-item" data-option="D">
+                                <div class="option-letter">D</div>
+                                <div class="option-text">Fourth option will appear here</div>
+                            </div>
+                        </div>
+                        
+                        <div id="quiz-feedback">
+                            Feedback will appear here
+                        </div>
+                        
+                        <div id="listening-indicator">
+                            <i class="fas fa-microphone"></i> Listening...
+                            <div class="wave">
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                                <div class="bar"></div>
+                            </div>
+                        </div>
+                        
+                        <div class="voice-controls">
+                            <div class="voice-title">
+                                <i class="fas fa-microphone-alt"></i> Voice Commands
+                            </div>
+                            <div class="voice-commands">
+                                <div class="voice-command">
+                                    <div class="command-icon">1</div>
+                                    <div>"Repeat question"</div>
+                                </div>
+                                <div class="voice-command">
+                                    <div class="command-icon">2</div>
+                                    <div>"Repeat options"</div>
+                                </div>
+                                <div class="voice-command">
+                                    <div class="command-icon">3</div>
+                                    <div>"Option A/B/C/D"</div>
+                                </div>
+                                <div class="voice-command">
+                                    <div class="command-icon">4</div>
+                                    <div>"Yes/No" to proceed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- My Results Tab -->
+                <div id="my-results-tab" class="tab-content">
+                    <h2>My Quiz Results</h2>
+                    <p>View your quiz performance and progress over time.</p>
+                    
+                    <div id="student-results-container">
+                        <!-- Student results will be displayed here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
