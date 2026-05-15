@@ -1,5 +1,3 @@
-# Flask Quiz Platform - Setup Instructions
-
 # ExamVoice — Accessible Exam Platform for Visually Impaired Students
 
 ## The Problem
