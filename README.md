@@ -1,5 +1,19 @@
 # Flask Quiz Platform - Setup Instructions
 
+# ExamVoice — Accessible Exam Platform for Visually Impaired Students
+
+## The Problem
+In India, blind students taking exams rely on human writers. 
+When a writer leaves mid-exam, the student cannot complete their paper. 
+This project gives blind students autonomy over their own assessments.
+
+## Features
+- Full voice command navigation (Chrome) + keyboard shortcuts (all browsers)
+- Screen reader compatible with ARIA live regions
+- Teacher dashboard with performance analytics
+- Timed exam mode
+- Works on any device with a browser
+
 ## Project Structure
 ```
 quiz_platform/
