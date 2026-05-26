@@ -1,77 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+
+    <!-- Mobile Responsiveness -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Accessible Quiz Platform{% endblock %}</title>
-    
+
+    <!-- Accessibility -->
+    <meta name="description"
+        content="ExamVoice is an accessible exam platform designed for visually impaired students with voice-enabled assessments and keyboard-friendly navigation.">
+
+    <title>
+        {% block title %}ExamVoice — Accessible Exam Platform{% endblock %}
+    </title>
+
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
+    <link rel="stylesheet"
+        href="{{ url_for('static', filename='css/style.css') }}">
+
     {% block extra_css %}{% endblock %}
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Skip Link */
+        .skip-link {
+            position: absolute;
+            top: -40px;
+            left: 10px;
+            background: #4f46e5;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 6px;
+            z-index: 1000;
+            text-decoration: none;
+        }
+
+        .skip-link:focus {
+            top: 10px;
+        }
+
+        /* Navbar */
+        .navbar {
+            background-color: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 14px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #4f46e5 !important;
+        }
+
+        .nav-link {
+            color: #475569 !important;
+            font-weight: 500;
+        }
+
+        .nav-link:hover,
+        .nav-link:focus {
+            color: #4f46e5 !important;
+        }
+
+        /* User Badge */
+        .user-badge {
+            background-color: #eef2ff;
+            color: #4f46e5;
+            padding: 6px 12px;
+            border-radius: 999px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        main {
+            padding: 30px 15px;
+        }
+
+        /* Toast */
+        .toast {
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .toast-header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Focus Visibility */
+        a:focus,
+        button:focus,
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: 3px solid #6366f1;
+            outline-offset: 2px;
+        }
+
+        @media (max-width: 768px) {
+
+            .navbar-collapse {
+                margin-top: 12px;
+            }
+
+            .navbar-nav {
+                gap: 10px;
+            }
+
+            main {
+                padding: 20px 10px;
+            }
+        }
+    </style>
 </head>
+
 <body>
+
+    <!-- Skip Navigation Link -->
+    <a href="#main-content"
+        class="skip-link">
+        Skip to Main Content
+    </a>
+
     <!-- Navigation -->
     {% if session.user_id %}
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav class="navbar navbar-expand-lg"
+        role="navigation"
+        aria-label="Main Navigation">
+
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('dashboard') }}">
-                <i class="fas fa-graduation-cap"></i> Quiz Platform
+
+            <!-- Logo -->
+            <a class="navbar-brand"
+                href="{{ url_for('dashboard') }}"
+                aria-label="ExamVoice Home">
+
+                <i class="fas fa-graduation-cap"
+                    aria-hidden="true"></i>
+
+                ExamVoice
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="navbar-toggler border-0 shadow-none"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNav"
+                aria-controls="navbarNav"
+                aria-expanded="false"
+                aria-label="Toggle navigation menu">
+
+                <i class="fas fa-bars"
+                    aria-hidden="true"></i>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+
+            <!-- Navbar Content -->
+            <div class="collapse navbar-collapse"
+                id="navbarNav">
+
+                <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-3">
+
+                    <!-- User Info -->
                     <li class="nav-item">
-                        <span class="navbar-text text-white me-3">
-                            <span class="badge bg-light text-primary">{{ session.role|upper }}</span>
-                            {{ session.username }}
+
+                        <span class="user-badge"
+                            aria-label="Logged in user information">
+
+                            {{ session.role|upper }} · {{ session.username }}
+
                         </span>
                     </li>
+
+                    <!-- Logout -->
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('logout') }}">
-                            <i class="fas fa-sign-out-alt"></i> Logout
+
+                        <a class="nav-link"
+                            href="{{ url_for('logout') }}"
+                            aria-label="Logout from account">
+
+                            <i class="fas fa-sign-out-alt me-1"
+                                aria-hidden="true"></i>
+
+                            Logout
                         </a>
+
                     </li>
+
                 </ul>
+
             </div>
         </div>
     </nav>
     {% endif %}
-    
+
     <!-- Main Content -->
-    <main>
+    <main id="main-content"
+        tabindex="-1"
+        role="main"
+        aria-label="Main Content Area">
+
         {% block content %}{% endblock %}
+
     </main>
-    
+
     <!-- Toast Notifications -->
-    <div class="toast-container position-fixed top-0 end-0 p-3">
-        <div id="notificationToast" class="toast" role="alert">
+    <div class="toast-container position-fixed top-0 end-0 p-3"
+        aria-live="polite"
+        aria-atomic="true">
+
+        <div id="notificationToast"
+            class="toast"
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true">
+
             <div class="toast-header">
-                <i class="fas fa-info-circle me-2"></i>
-                <strong class="me-auto">Notification</strong>
-                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+
+                <i class="fas fa-bell text-primary me-2"
+                    aria-hidden="true"></i>
+
+                <strong class="me-auto">
+                    Notification
+                </strong>
+
+                <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="toast"
+                    aria-label="Close notification">
+                </button>
+
             </div>
-            <div class="toast-body"></div>
+
+            <div class="toast-body"
+                aria-label="Notification message">
+            </div>
+
         </div>
     </div>
-    
+
     <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
+    </script>
+
     <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-    
+    <script
+        src="{{ url_for('static', filename='js/main.js') }}">
+    </script>
+
     {% block extra_js %}{% endblock %}
+
 </body>
+
 </html>

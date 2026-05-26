@@ -1,87 +1,277 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="auth-container">
+
+<section class="auth-container"
+    aria-label="Authentication Page">
+
     <div class="container">
+
         <div class="row justify-content-center">
+
             <div class="col-md-6 col-lg-5">
-                <div class="card shadow-lg">
-                    <div class="card-header text-center bg-primary text-white py-4">
-                        <h1 class="mb-2"><i class="fas fa-graduation-cap"></i> Quiz Platform</h1>
-                        <p class="mb-0">Interactive voice-enabled quizzes for all students</p>
-                    </div>
-                    <div class="card-body p-4">
-                        <h3 class="text-center mb-4" id="auth-title">Welcome - Please Sign In</h3>
-                        
-                        <!-- Role Selection -->
-                        <div class="row mb-4" id="role-selection">
-                            <div class="col-6">
-                                <div class="role-card text-center p-3" data-role="teacher">
-                                    <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-3"></i>
-                                    <h5>Teacher</h5>
-                                    <p class="small text-muted">Create and manage quizzes</p>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="role-card text-center p-3" data-role="student">
-                                    <i class="fas fa-user-graduate fa-3x text-primary mb-3"></i>
-                                    <h5>Student</h5>
-                                    <p class="small text-muted">Take quizzes and view results</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Auth Form -->
-                        <form id="auth-form">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">Username</label>
-                                <input type="text" class="form-control" id="username" name="username" required>
-                            </div>
-                            
-                            <div class="mb-3" id="email-group" style="display: none;">
-                                <label for="email" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="email" name="email">
-                            </div>
-                            
-                            <div class="mb-3">
-                                <label for="password" class="form-label">Password</label>
-                                <input type="password" class="form-control" id="password" name="password" required>
-                            </div>
-                            
-                            <div class="mb-3" id="confirm-password-group" style="display: none;">
-                                <label for="confirm-password" class="form-label">Confirm Password</label>
-                                <input type="password" class="form-control" id="confirm-password" name="confirm-password">
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary w-100" id="auth-submit-btn">
-                                <i class="fas fa-sign-in-alt"></i> Sign In
-                            </button>
-                        </form>
-                        
-                        <div class="text-center mt-3">
-                            <button type="button" class="btn btn-link" id="auth-toggle-btn">
-                                Don't have an account? Register here
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Demo Accounts Info -->
-                <div class="card mt-3 bg-light">
-                    <div class="card-body">
-                        <h6 class="card-title"><i class="fas fa-info-circle"></i> Demo Accounts</h6>
-                        <p class="small mb-0">
-                            <strong>Teacher:</strong> demo_teacher / demo123<br>
-                            <strong>Student:</strong> demo_student / demo123
+
+                <!-- Auth Card -->
+                <div class="card border-0 shadow-sm">
+
+                    <!-- Header -->
+                    <div class="card-header text-center py-4">
+
+                        <h1 class="h3 mb-2">
+
+                            <i class="fas fa-graduation-cap"
+                                aria-hidden="true"></i>
+
+                            ExamVoice
+
+                        </h1>
+
+                        <p class="mb-0 text-muted">
+
+                            Accessible voice-enabled examination platform for visually impaired students
+
                         </p>
+
                     </div>
+
+                    <!-- Card Body -->
+                    <div class="card-body p-4">
+
+                        <!-- Title -->
+                        <h2 class="h5 text-center mb-4"
+                            id="auth-title">
+
+                            Welcome — Please Sign In
+
+                        </h2>
+
+                        <!-- Role Selection -->
+                        <section id="role-selection"
+                            class="mb-4"
+                            aria-label="Select user role">
+
+                            <div class="row g-3">
+
+                                <!-- Teacher -->
+                                <div class="col-6">
+
+                                    <button type="button"
+                                        class="role-card w-100 text-center p-3 border rounded bg-white"
+                                        data-role="teacher"
+                                        aria-label="Select Teacher Role">
+
+                                        <i class="fas fa-chalkboard-teacher fa-2x text-primary mb-2"
+                                            aria-hidden="true"></i>
+
+                                        <h3 class="h6 mb-1">
+                                            Teacher
+                                        </h3>
+
+                                        <p class="small text-muted mb-0">
+                                            Create and manage quizzes
+                                        </p>
+
+                                    </button>
+
+                                </div>
+
+                                <!-- Student -->
+                                <div class="col-6">
+
+                                    <button type="button"
+                                        class="role-card w-100 text-center p-3 border rounded bg-white"
+                                        data-role="student"
+                                        aria-label="Select Student Role">
+
+                                        <i class="fas fa-user-graduate fa-2x text-primary mb-2"
+                                            aria-hidden="true"></i>
+
+                                        <h3 class="h6 mb-1">
+                                            Student
+                                        </h3>
+
+                                        <p class="small text-muted mb-0">
+                                            Take quizzes and view results
+                                        </p>
+
+                                    </button>
+
+                                </div>
+
+                            </div>
+
+                        </section>
+
+                        <!-- Authentication Form -->
+                        <form id="auth-form"
+                            aria-label="Authentication Form">
+
+                            <!-- Username -->
+                            <div class="mb-3">
+
+                                <label for="username"
+                                    class="form-label">
+
+                                    Username
+
+                                </label>
+
+                                <input type="text"
+                                    class="form-control"
+                                    id="username"
+                                    name="username"
+                                    autocomplete="username"
+                                    aria-required="true"
+                                    aria-label="Enter your username"
+                                    required>
+
+                            </div>
+
+                            <!-- Email -->
+                            <div class="mb-3"
+                                id="email-group"
+                                style="display: none;">
+
+                                <label for="email"
+                                    class="form-label">
+
+                                    Email
+
+                                </label>
+
+                                <input type="email"
+                                    class="form-control"
+                                    id="email"
+                                    name="email"
+                                    autocomplete="email"
+                                    aria-label="Enter your email address">
+
+                            </div>
+
+                            <!-- Password -->
+                            <div class="mb-3">
+
+                                <label for="password"
+                                    class="form-label">
+
+                                    Password
+
+                                </label>
+
+                                <input type="password"
+                                    class="form-control"
+                                    id="password"
+                                    name="password"
+                                    autocomplete="current-password"
+                                    aria-required="true"
+                                    aria-label="Enter your password"
+                                    required>
+
+                            </div>
+
+                            <!-- Confirm Password -->
+                            <div class="mb-3"
+                                id="confirm-password-group"
+                                style="display: none;">
+
+                                <label for="confirm-password"
+                                    class="form-label">
+
+                                    Confirm Password
+
+                                </label>
+
+                                <input type="password"
+                                    class="form-control"
+                                    id="confirm-password"
+                                    name="confirm-password"
+                                    autocomplete="new-password"
+                                    aria-label="Confirm your password">
+
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit"
+                                class="btn btn-primary w-100"
+                                id="auth-submit-btn"
+                                aria-label="Submit authentication form">
+
+                                <i class="fas fa-sign-in-alt"
+                                    aria-hidden="true"></i>
+
+                                Sign In
+
+                            </button>
+
+                        </form>
+
+                        <!-- Toggle -->
+                        <div class="text-center mt-3">
+
+                            <button type="button"
+                                class="btn btn-link text-decoration-none"
+                                id="auth-toggle-btn"
+                                aria-label="Switch between login and registration">
+
+                                Don't have an account? Register here
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
                 </div>
+
+                <!-- Demo Accounts -->
+                <section class="card border-0 shadow-sm mt-3"
+                    aria-label="Demo account credentials">
+
+                    <div class="card-body">
+
+                        <h2 class="h6 card-title">
+
+                            <i class="fas fa-info-circle"
+                                aria-hidden="true"></i>
+
+                            Demo Accounts
+
+                        </h2>
+
+                        <div class="small">
+
+                            <p class="mb-1">
+
+                                <strong>Teacher:</strong>
+                                demo_teacher / demo123
+
+                            </p>
+
+                            <p class="mb-0">
+
+                                <strong>Student:</strong>
+                                demo_student / demo123
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </section>
+
             </div>
+
         </div>
+
     </div>
-</div>
+
+</section>
+
 {% endblock %}
 
 {% block extra_js %}
+
 <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+
 {% endblock %}
