@@ -1,544 +1,602 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<!--
+    The outer container needs no ARIA role — <main> in base.html already
+    provides the landmark. We add an aria-label on each dashboard so screen
+    readers announce which view is active when the page loads.
+-->
 <div class="container py-4">
 
-    <!-- =========================
+    <!-- ═══════════════════════════════════════════════════════════════════
          TEACHER DASHBOARD
-    ========================== -->
+    ═══════════════════════════════════════════════════════════════════════ -->
     {% if role == 'teacher' %}
+    <div id="teacher-dashboard" aria-label="Teacher Dashboard">
 
-    <section id="teacher-dashboard"
-        aria-label="Teacher Dashboard">
+        <!--
+            ① Tab List
+            • role="tablist" on the <ul> and role="tab" on each <a> exposes
+              the widget as a proper ARIA tab pattern instead of plain links.
+            • aria-selected reflects which tab is active; JS must keep this
+              in sync when the user switches tabs.
+            • aria-controls links each tab to its corresponding panel id.
+            • Decorative icons get aria-hidden="true".
+            • tabindex="-1" on inactive tabs follows the "roving tabindex"
+              pattern: only the active tab is in the natural tab order; arrow
+              keys move between tabs (Bootstrap handles this automatically when
+              role="tab" is present).
+        -->
+        <ul class="nav nav-pills mb-4 justify-content-center"
+            role="tablist"
+            aria-label="Teacher dashboard sections">
 
-        <!-- Navigation Tabs -->
-        <nav aria-label="Teacher Dashboard Navigation">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active"
+                   id="tab-create-quiz"
+                   data-bs-toggle="tab"
+                   href="#create-quiz"
+                   role="tab"
+                   aria-controls="create-quiz"
+                   aria-selected="true">
+                    <i class="fas fa-plus" aria-hidden="true"></i>
+                    Create Quiz
+                </a>
+            </li>
 
-            <ul class="nav nav-pills mb-4 justify-content-center"
-                role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link"
+                   id="tab-manage-quizzes"
+                   data-bs-toggle="tab"
+                   href="#manage-quizzes"
+                   role="tab"
+                   aria-controls="manage-quizzes"
+                   aria-selected="false"
+                   tabindex="-1">
+                    <i class="fas fa-list" aria-hidden="true"></i>
+                    Manage Quizzes
+                </a>
+            </li>
 
-                <li class="nav-item" role="presentation">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link"
+                   id="tab-view-results"
+                   data-bs-toggle="tab"
+                   href="#view-results"
+                   role="tab"
+                   aria-controls="view-results"
+                   aria-selected="false"
+                   tabindex="-1">
+                    <i class="fas fa-chart-bar" aria-hidden="true"></i>
+                    View Results
+                </a>
+            </li>
+        </ul>
 
-                    <button class="nav-link active"
-                        id="create-quiz-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#create-quiz"
-                        type="button"
-                        role="tab"
-                        aria-controls="create-quiz"
-                        aria-selected="true">
-
-                        <i class="fas fa-plus"
-                            aria-hidden="true"></i>
-
-                        Create Quiz
-                    </button>
-
-                </li>
-
-                <li class="nav-item" role="presentation">
-
-                    <button class="nav-link"
-                        id="manage-quizzes-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#manage-quizzes"
-                        type="button"
-                        role="tab"
-                        aria-controls="manage-quizzes"
-                        aria-selected="false">
-
-                        <i class="fas fa-list"
-                            aria-hidden="true"></i>
-
-                        Manage Quizzes
-                    </button>
-
-                </li>
-
-                <li class="nav-item" role="presentation">
-
-                    <button class="nav-link"
-                        id="view-results-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#view-results"
-                        type="button"
-                        role="tab"
-                        aria-controls="view-results"
-                        aria-selected="false">
-
-                        <i class="fas fa-chart-bar"
-                            aria-hidden="true"></i>
-
-                        View Results
-                    </button>
-
-                </li>
-
-            </ul>
-
-        </nav>
-
-        <!-- Tab Content -->
         <div class="tab-content">
 
-            <!-- Create Quiz -->
-            <section class="tab-pane fade show active"
-                id="create-quiz"
-                role="tabpanel"
-                aria-labelledby="create-quiz-tab">
+            <!-- ── Create Quiz Tab Panel ──────────────────────────────────
+                 • role="tabpanel" marks this as the content region for the tab.
+                 • aria-labelledby ties the panel back to its controlling tab
+                   so screen readers announce "Create Quiz, tab panel" when
+                   focus enters.
+                 • tabindex="0" makes the panel itself focusable so keyboard
+                   users can Tab into it after activating the tab.
+            -->
+            <div class="tab-pane fade show active"
+                 id="create-quiz"
+                 role="tabpanel"
+                 aria-labelledby="tab-create-quiz"
+                 tabindex="0">
 
                 <div class="card">
-
                     <div class="card-header">
-
-                        <h2 class="h5 mb-0">
-
-                            <i class="fas fa-plus-circle"
-                                aria-hidden="true"></i>
-
+                        <!--
+                            Heading hierarchy: h2 inside a section that is
+                            already inside <main> (h1-level). Using h3 would
+                            skip a level, which confuses screen-reader heading
+                            navigation. Adjust the level to match your global
+                            document outline.
+                        -->
+                        <h2>
+                            <i class="fas fa-plus-circle" aria-hidden="true"></i>
                             Create a New Quiz
-
                         </h2>
-
                     </div>
 
                     <div class="card-body">
-
+                        <!--
+                            ② Quiz Form
+                            • aria-label names the form landmark so it is
+                              distinguishable when multiple forms exist.
+                            • novalidate lets us provide custom accessible
+                              validation feedback instead of browser-native
+                              tooltips (which are not reliably read by all SRs).
+                        -->
                         <form id="quiz-form"
-                            aria-label="Create Quiz Form">
+                              aria-label="Create new quiz"
+                              novalidate>
 
-                            <!-- Quiz Title -->
                             <div class="mb-3">
-
-                                <label for="quiz-title"
-                                    class="form-label">
-
+                                <!--
+                                    for="quiz-title" programmatically associates
+                                    the label with the input — mandatory for all
+                                    form controls. Already present, kept intact.
+                                -->
+                                <label for="quiz-title" class="form-label">
                                     Quiz Title
-
+                                    <!--
+                                        Visually mark required fields. The
+                                        aria-hidden span hides the asterisk from
+                                        SRs; the input's aria-required="true"
+                                        communicates the requirement instead,
+                                        preventing double-announcement.
+                                    -->
+                                    <span aria-hidden="true" class="text-danger"> *</span>
                                 </label>
-
                                 <input type="text"
-                                    class="form-control"
-                                    id="quiz-title"
-                                    aria-required="true"
-                                    aria-label="Enter quiz title"
-                                    required>
-
+                                       class="form-control"
+                                       id="quiz-title"
+                                       name="quiz-title"
+                                       required
+                                       aria-required="true"
+                                       aria-describedby="quiz-title-hint"
+                                       autocomplete="off">
+                                <div id="quiz-title-hint" class="form-text">
+                                    Enter a clear, descriptive title for the quiz.
+                                </div>
                             </div>
 
-                            <!-- Quiz Description -->
                             <div class="mb-3">
-
-                                <label for="quiz-description"
-                                    class="form-label">
-
+                                <label for="quiz-description" class="form-label">
                                     Quiz Description
-
                                 </label>
-
                                 <textarea class="form-control"
-                                    id="quiz-description"
-                                    rows="3"
-                                    aria-label="Enter quiz description">
-                                </textarea>
-
+                                          id="quiz-description"
+                                          name="quiz-description"
+                                          rows="2"
+                                          aria-describedby="quiz-description-hint"></textarea>
+                                <div id="quiz-description-hint" class="form-text">
+                                    Optional. Describe the topic or instructions for students.
+                                </div>
                             </div>
 
-                            <hr>
+                            <hr aria-hidden="true">
 
-                            <!-- Questions -->
-                            <section id="questions-container"
-                                aria-label="Quiz Questions">
+                            <!--
+                                ③ Dynamic Questions Container
+                                • role="group" + aria-label wraps the
+                                  dynamically injected question blocks into a
+                                  named group so screen readers announce "Quiz
+                                  questions group" when focus enters.
+                                • aria-live="polite" ensures that when a new
+                                  question is added, screen readers announce
+                                  it without interrupting the user.
+                            -->
+                            <div id="questions-container"
+                                 role="group"
+                                 aria-label="Quiz questions"
+                                 aria-live="polite"
+                                 aria-relevant="additions removals">
+                                <!-- Questions injected here by teacher.js -->
+                            </div>
 
-                                <!-- Questions injected dynamically -->
-
-                            </section>
-
-                            <!-- Buttons -->
-                            <div class="d-flex flex-wrap gap-2 mt-3">
-
+                            <!--
+                                ④ Action Buttons
+                                • type="button" on Add Question prevents
+                                  accidental form submission.
+                                • aria-label on Save clarifies intent since
+                                  the icon alone is ambiguous.
+                            -->
+                            <div class="d-flex gap-2 mt-3" role="group" aria-label="Quiz form actions">
                                 <button type="button"
-                                    class="btn btn-outline-primary"
-                                    id="add-question-btn"
-                                    aria-label="Add new question">
-
-                                    <i class="fas fa-plus"
-                                        aria-hidden="true"></i>
-
+                                        class="btn btn-secondary"
+                                        id="add-question-btn"
+                                        aria-label="Add a new question to the quiz">
+                                    <i class="fas fa-plus" aria-hidden="true"></i>
                                     Add Question
-
                                 </button>
 
                                 <button type="submit"
-                                    class="btn btn-primary"
-                                    aria-label="Save quiz">
-
-                                    <i class="fas fa-save"
-                                        aria-hidden="true"></i>
-
+                                        class="btn btn-primary"
+                                        aria-label="Save quiz and all questions">
+                                    <i class="fas fa-save" aria-hidden="true"></i>
                                     Save Quiz
-
                                 </button>
-
                             </div>
 
                         </form>
-
                     </div>
-
                 </div>
+            </div>
 
-            </section>
-
-            <!-- Manage Quizzes -->
-            <section class="tab-pane fade"
-                id="manage-quizzes"
-                role="tabpanel"
-                aria-labelledby="manage-quizzes-tab">
+            <!-- ── Manage Quizzes Tab Panel ───────────────────────────────-->
+            <div class="tab-pane fade"
+                 id="manage-quizzes"
+                 role="tabpanel"
+                 aria-labelledby="tab-manage-quizzes"
+                 tabindex="0">
 
                 <div class="card">
-
                     <div class="card-header">
-
-                        <h2 class="h5 mb-0">
-
-                            <i class="fas fa-list"
-                                aria-hidden="true"></i>
-
+                        <h2>
+                            <i class="fas fa-list" aria-hidden="true"></i>
                             Manage Your Quizzes
-
                         </h2>
-
                     </div>
-
                     <div class="card-body">
-
+                        <!--
+                            aria-live="polite" + aria-busy="true" pattern:
+                            Set aria-busy="true" in JS while fetching data,
+                            then set it to "false" once content is injected.
+                            Screen readers will hold their announcement until
+                            the region is no longer busy.
+                        -->
                         <div id="teacher-quiz-list"
-                            aria-live="polite"
-                            aria-label="Teacher quizzes list">
-
-                            <!-- Dynamic quiz list -->
-
+                             aria-live="polite"
+                             aria-busy="true"
+                             aria-label="Your quizzes">
+                            <!-- Quizzes loaded by teacher.js -->
                         </div>
-
                     </div>
-
                 </div>
+            </div>
 
-            </section>
-
-            <!-- View Results -->
-            <section class="tab-pane fade"
-                id="view-results"
-                role="tabpanel"
-                aria-labelledby="view-results-tab">
+            <!-- ── View Results Tab Panel ─────────────────────────────────-->
+            <div class="tab-pane fade"
+                 id="view-results"
+                 role="tabpanel"
+                 aria-labelledby="tab-view-results"
+                 tabindex="0">
 
                 <div class="card">
-
                     <div class="card-header">
-
-                        <h2 class="h5 mb-0">
-
-                            <i class="fas fa-chart-bar"
-                                aria-hidden="true"></i>
-
+                        <h2>
+                            <i class="fas fa-chart-bar" aria-hidden="true"></i>
                             Quiz Results
-
                         </h2>
-
                     </div>
-
                     <div class="card-body">
-
                         <div id="results-container"
-                            aria-live="polite"
-                            aria-label="Quiz results section">
-
-                            <!-- Results injected dynamically -->
-
+                             aria-live="polite"
+                             aria-busy="true"
+                             aria-label="Quiz results">
+                            <!-- Results loaded by teacher.js -->
                         </div>
-
                     </div>
-
                 </div>
+            </div>
 
-            </section>
-
-        </div>
-
-    </section>
-
+        </div><!-- /.tab-content -->
+    </div><!-- /#teacher-dashboard -->
     {% endif %}
 
-    <!-- =========================
+
+    <!-- ═══════════════════════════════════════════════════════════════════
          STUDENT DASHBOARD
-    ========================== -->
+    ═══════════════════════════════════════════════════════════════════════ -->
     {% if role == 'student' %}
+    <div id="student-dashboard" aria-label="Student Dashboard">
 
-    <section id="student-dashboard"
-        aria-label="Student Dashboard">
+        <ul class="nav nav-pills mb-4 justify-content-center"
+            role="tablist"
+            aria-label="Student dashboard sections">
 
-        <!-- Student Tabs -->
-        <nav aria-label="Student Dashboard Navigation">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link active"
+                   id="tab-available-quizzes"
+                   data-bs-toggle="tab"
+                   href="#available-quizzes"
+                   role="tab"
+                   aria-controls="available-quizzes"
+                   aria-selected="true">
+                    <i class="fas fa-list" aria-hidden="true"></i>
+                    Available Quizzes
+                </a>
+            </li>
 
-            <ul class="nav nav-pills mb-4 justify-content-center"
-                role="tablist">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link"
+                   id="tab-take-quiz"
+                   data-bs-toggle="tab"
+                   href="#take-quiz"
+                   role="tab"
+                   aria-controls="take-quiz"
+                   aria-selected="false"
+                   tabindex="-1">
+                    <i class="fas fa-play" aria-hidden="true"></i>
+                    Take Quiz
+                </a>
+            </li>
 
-                <li class="nav-item" role="presentation">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link"
+                   id="tab-my-results"
+                   data-bs-toggle="tab"
+                   href="#my-results"
+                   role="tab"
+                   aria-controls="my-results"
+                   aria-selected="false"
+                   tabindex="-1">
+                    <i class="fas fa-trophy" aria-hidden="true"></i>
+                    My Results
+                </a>
+            </li>
+        </ul>
 
-                    <button class="nav-link active"
-                        id="available-quizzes-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#available-quizzes"
-                        type="button"
-                        role="tab"
-                        aria-controls="available-quizzes"
-                        aria-selected="true">
-
-                        <i class="fas fa-list"
-                            aria-hidden="true"></i>
-
-                        Available Quizzes
-
-                    </button>
-
-                </li>
-
-                <li class="nav-item" role="presentation">
-
-                    <button class="nav-link"
-                        id="take-quiz-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#take-quiz"
-                        type="button"
-                        role="tab"
-                        aria-controls="take-quiz"
-                        aria-selected="false">
-
-                        <i class="fas fa-play"
-                            aria-hidden="true"></i>
-
-                        Take Quiz
-
-                    </button>
-
-                </li>
-
-                <li class="nav-item" role="presentation">
-
-                    <button class="nav-link"
-                        id="my-results-tab"
-                        data-bs-toggle="tab"
-                        data-bs-target="#my-results"
-                        type="button"
-                        role="tab"
-                        aria-controls="my-results"
-                        aria-selected="false">
-
-                        <i class="fas fa-trophy"
-                            aria-hidden="true"></i>
-
-                        My Results
-
-                    </button>
-
-                </li>
-
-            </ul>
-
-        </nav>
-
-        <!-- Student Content -->
         <div class="tab-content">
 
-            <!-- Available Quizzes -->
-            <section class="tab-pane fade show active"
-                id="available-quizzes"
-                role="tabpanel"
-                aria-labelledby="available-quizzes-tab">
+            <!-- ── Available Quizzes Tab Panel ────────────────────────────-->
+            <div class="tab-pane fade show active"
+                 id="available-quizzes"
+                 role="tabpanel"
+                 aria-labelledby="tab-available-quizzes"
+                 tabindex="0">
 
                 <div class="card">
-
                     <div class="card-header">
-
-                        <h2 class="h5 mb-0">
-
-                            <i class="fas fa-list-ul"
-                                aria-hidden="true"></i>
-
+                        <h2>
+                            <i class="fas fa-list-ul" aria-hidden="true"></i>
                             Available Quizzes
-
                         </h2>
-
                     </div>
-
                     <div class="card-body">
-
                         <div id="student-quiz-list"
-                            aria-live="polite"
-                            aria-label="Available quizzes list">
-
-                            <!-- Dynamic quizzes -->
-
+                             aria-live="polite"
+                             aria-busy="true"
+                             aria-label="Available quizzes list">
+                            <!-- Quizzes loaded by student.js -->
                         </div>
-
                     </div>
-
                 </div>
+            </div>
 
-            </section>
-
-            <!-- Take Quiz -->
-            <section class="tab-pane fade"
-                id="take-quiz"
-                role="tabpanel"
-                aria-labelledby="take-quiz-tab">
+            <!-- ── Take Quiz Tab Panel ────────────────────────────────────-->
+            <div class="tab-pane fade"
+                 id="take-quiz"
+                 role="tabpanel"
+                 aria-labelledby="tab-take-quiz"
+                 tabindex="0">
 
                 <div class="card">
-
                     <div class="card-header">
-
-                        <h2 id="quiz-title-header"
-                            class="h5 mb-0">
-
-                            Take Quiz
-
-                        </h2>
-
+                        <!--
+                            id="quiz-title-header" is referenced by student.js
+                            to update the quiz name dynamically. aria-live here
+                            would be too noisy; the live region in base.html
+                            handles dynamic announcements instead.
+                        -->
+                        <h2 id="quiz-title-header">Take Quiz</h2>
                     </div>
 
                     <div class="card-body">
 
-                        <!-- Progress -->
+                        <!--
+                            ⑤ Progress Bar
+                            • role="progressbar" is already present — good.
+                            • aria-valuetext gives a human-readable string
+                              ("Question 2 of 10") instead of forcing the SR
+                              to announce the raw percentage, which is
+                              meaningless without context.
+                            • aria-label names the bar since its visible text
+                              may be empty at load time.
+                            • JS must update aria-valuenow AND aria-valuetext
+                              together every time the question advances.
+                        -->
                         <div class="progress mb-4"
-                            role="progressbar"
-                            aria-label="Quiz Progress">
-
+                             style="height: 25px;"
+                             aria-label="Quiz progress">
                             <div class="progress-bar"
-                                id="quiz-progress"
-                                style="width: 0%;"
-                                aria-valuenow="0"
-                                aria-valuemin="0"
-                                aria-valuemax="100">
-
-                                Question 0 of 0
-
+                                 id="quiz-progress"
+                                 role="progressbar"
+                                 style="width: 0%;"
+                                 aria-valuenow="0"
+                                 aria-valuemin="0"
+                                 aria-valuemax="100"
+                                 aria-valuetext="Question 0 of 0"
+                                 aria-label="Quiz progress">
+                                <span aria-hidden="true">Question 0 of 0</span>
                             </div>
-
                         </div>
 
-                        <!-- Quiz Content -->
-                        <section id="quiz-content"
-                            aria-live="polite"
-                            aria-label="Quiz questions area">
-
-                            <div class="alert alert-info">
-
+                        <!--
+                            ⑥ Quiz Content Area
+                            • role="region" + aria-label creates a named
+                              landmark so power users can jump to it directly.
+                            • aria-live="polite" announces new questions as
+                              they are injected without interrupting the user.
+                            • aria-atomic="false" lets the SR read only the
+                              newly added content rather than the entire region.
+                        -->
+                        <div id="quiz-content"
+                             role="region"
+                             aria-label="Current quiz question"
+                             aria-live="polite"
+                             aria-atomic="false">
+                            <div class="alert alert-info" role="status">
                                 Select a quiz from the Available Quizzes tab to begin.
-
                             </div>
-
-                        </section>
-
-                        <!-- Voice Listening -->
-                        <div id="listening-indicator"
-                            class="alert alert-info mt-3"
-                            style="display: none;"
-                            role="status"
-                            aria-live="assertive">
-
-                            <i class="fas fa-microphone"
-                                aria-hidden="true"></i>
-
-                            Listening for voice commands...
-
                         </div>
 
-                        <!-- Voice Commands -->
-                        <section class="card mt-3">
+                        <!--
+                            ⑦ Voice Listening Indicator
+                            • role="status" + aria-live="polite" means the SR
+                              will announce "Listening for voice commands" when
+                              this becomes visible, without stealing focus.
+                            • aria-hidden="true" when hidden (set by JS) avoids
+                              the hidden alert being picked up by the AT tree.
+                        -->
+                        <div id="listening-indicator"
+                             class="alert alert-info mt-3"
+                             role="status"
+                             aria-live="polite"
+                             aria-label="Voice recognition status"
+                             style="display: none;"
+                             aria-hidden="true">
+                            <i class="fas fa-microphone" aria-hidden="true"></i>
+                            Listening for voice commands…
+                        </div>
 
+                        <!--
+                            ⑧ Voice Commands Reference Card
+                            • role="region" + aria-label creates a named
+                              landmark for this help section.
+                            • The icon-prefixed list items need the icons
+                              hidden so screen readers don't say "check
+                              repeat question".
+                            • Each <ul> gets aria-label so the two lists are
+                              distinguishable when navigated independently.
+                        -->
+                        <section class="card mt-3 bg-light"
+                                 aria-label="Available voice commands">
                             <div class="card-body">
-
-                                <h3 class="h6">
-
-                                    <i class="fas fa-microphone-alt"
-                                        aria-hidden="true"></i>
-
+                                <h3 id="voice-commands-heading">
+                                    <i class="fas fa-microphone-alt" aria-hidden="true"></i>
                                     Voice Commands
-
                                 </h3>
 
-                                <ul class="list-unstyled mb-0">
+                                <div class="row"
+                                     role="group"
+                                     aria-labelledby="voice-commands-heading">
 
-                                    <li>"Repeat question"</li>
-                                    <li>"Repeat options"</li>
-                                    <li>"Option A/B/C/D"</li>
-                                    <li>"Yes" or "No" to proceed</li>
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled"
+                                            aria-label="Playback commands">
+                                            <li>
+                                                <i class="fas fa-check text-success" aria-hidden="true"></i>
+                                                "Repeat question"
+                                            </li>
+                                            <li>
+                                                <i class="fas fa-check text-success" aria-hidden="true"></i>
+                                                "Repeat options"
+                                            </li>
+                                        </ul>
+                                    </div>
 
-                                </ul>
-
+                                    <div class="col-md-6">
+                                        <ul class="list-unstyled"
+                                            aria-label="Answer and navigation commands">
+                                            <li>
+                                                <i class="fas fa-check text-success" aria-hidden="true"></i>
+                                                "Option A", "Option B", "Option C", or "Option D" to select an answer
+                                            </li>
+                                            <li>
+                                                <i class="fas fa-check text-success" aria-hidden="true"></i>
+                                                "Yes" or "No" to proceed
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
-
                         </section>
 
                     </div>
-
                 </div>
+            </div>
 
-            </section>
-
-            <!-- Results -->
-            <section class="tab-pane fade"
-                id="my-results"
-                role="tabpanel"
-                aria-labelledby="my-results-tab">
+            <!-- ── My Results Tab Panel ───────────────────────────────────-->
+            <div class="tab-pane fade"
+                 id="my-results"
+                 role="tabpanel"
+                 aria-labelledby="tab-my-results"
+                 tabindex="0">
 
                 <div class="card">
-
                     <div class="card-header">
-
-                        <h2 class="h5 mb-0">
-
-                            <i class="fas fa-trophy"
-                                aria-hidden="true"></i>
-
+                        <h2>
+                            <i class="fas fa-trophy" aria-hidden="true"></i>
                             My Quiz Results
-
                         </h2>
-
                     </div>
-
                     <div class="card-body">
-
                         <div id="student-results-container"
-                            aria-live="polite"
-                            aria-label="Student quiz results">
-
-                            <!-- Results dynamically loaded -->
-
+                             aria-live="polite"
+                             aria-busy="true"
+                             aria-label="Your quiz results">
+                            <!-- Results loaded by student.js -->
                         </div>
-
                     </div>
-
                 </div>
+            </div>
 
-            </section>
-
-        </div>
-
-    </section>
-
+        </div><!-- /.tab-content -->
+    </div><!-- /#student-dashboard -->
     {% endif %}
 
-</div>
-
+</div><!-- /.container -->
 {% endblock %}
 
-{% block extra_js %}
 
+{% block extra_js %}
 <script>
     const USER_ROLE = "{{ role }}";
+
+    /*
+        ⑨ Tab switching: keep aria-selected in sync
+        Bootstrap toggles the .active class but does NOT update aria-selected
+        on custom tab implementations. This listener does that, plus moves
+        focus into the newly revealed panel so keyboard users don't have to
+        Tab all the way there manually.
+    */
+    document.addEventListener('DOMContentLoaded', () => {
+        const tabLinks = document.querySelectorAll('[role="tab"]');
+
+        tabLinks.forEach(tab => {
+            tab.addEventListener('shown.bs.tab', (event) => {
+                // Deactivate all tabs in the same tablist
+                const tabList = event.target.closest('[role="tablist"]');
+                tabList.querySelectorAll('[role="tab"]').forEach(t => {
+                    t.setAttribute('aria-selected', 'false');
+                    t.setAttribute('tabindex', '-1');
+                });
+
+                // Activate the selected tab
+                event.target.setAttribute('aria-selected', 'true');
+                event.target.setAttribute('tabindex', '0');
+
+                // Move focus to the panel so keyboard users land inside it
+                const panelId = event.target.getAttribute('aria-controls');
+                const panel = document.getElementById(panelId);
+                if (panel) panel.focus();
+            });
+        });
+
+        /*
+            ⑩ Dynamic containers: clear aria-busy once content is injected.
+            In student.js / teacher.js, call this helper after each fetch:
+                markLoaded('student-quiz-list');
+        */
+        window.markLoaded = function(containerId) {
+            const el = document.getElementById(containerId);
+            if (el) el.setAttribute('aria-busy', 'false');
+        };
+
+        /*
+            ⑪ Progress bar helper for student.js
+            Call: updateQuizProgress(currentQuestion, totalQuestions)
+        */
+        window.updateQuizProgress = function(current, total) {
+            const bar = document.getElementById('quiz-progress');
+            if (!bar) return;
+            const pct = total > 0 ? Math.round((current / total) * 100) : 0;
+            bar.style.width = pct + '%';
+            bar.setAttribute('aria-valuenow', pct);
+            bar.setAttribute('aria-valuetext', `Question ${current} of ${total}`);
+            bar.querySelector('span').textContent = `Question ${current} of ${total}`;
+        };
+
+        /*
+            ⑫ Listening indicator: toggle aria-hidden alongside display
+            Call: setListening(true) / setListening(false) in student.js
+        */
+        window.setListening = function(active) {
+            const indicator = document.getElementById('listening-indicator');
+            if (!indicator) return;
+            indicator.style.display = active ? 'block' : 'none';
+            indicator.setAttribute('aria-hidden', String(!active));
+            if (active) window.announceToUser('Listening for voice commands.');
+        };
+    });
 </script>
 
 {% if role == 'teacher' %}
@@ -546,5 +604,4 @@
 {% else %}
 <script src="{{ url_for('static', filename='js/student.js') }}"></script>
 {% endif %}
-
 {% endblock %}

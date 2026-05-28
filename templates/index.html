@@ -1,277 +1,447 @@
 {% extends "base.html" %}
 
 {% block content %}
-
-<section class="auth-container"
-    aria-label="Authentication Page">
-
+<!--
+    auth-container wraps the full page; no extra landmark role needed
+    since <main> in base.html already provides the top-level landmark.
+-->
+<div class="auth-container">
     <div class="container">
-
         <div class="row justify-content-center">
-
             <div class="col-md-6 col-lg-5">
 
-                <!-- Auth Card -->
-                <div class="card border-0 shadow-sm">
+                <div class="card shadow-lg">
 
-                    <!-- Header -->
-                    <div class="card-header text-center py-4">
-
-                        <h1 class="h3 mb-2">
-
-                            <i class="fas fa-graduation-cap"
-                                aria-hidden="true"></i>
-
-                            ExamVoice
-
+                    <!-- ① Card Header / Page Identity ──────────────────────
+                         • The platform name is an <h1> — correct for a
+                           standalone auth page that has no other heading
+                           above it inside <main>.
+                         • The tagline is a plain <p>; no heading level needed.
+                         • The icon is decorative — aria-hidden="true".
+                    -->
+                    <div class="card-header text-center bg-primary text-white py-4">
+                        <h1 class="mb-2">
+                            <i class="fas fa-graduation-cap" aria-hidden="true"></i>
+                            Quiz Platform
                         </h1>
-
-                        <p class="mb-0 text-muted">
-
-                            Accessible voice-enabled examination platform for visually impaired students
-
-                        </p>
-
+                        <p class="mb-0">Interactive voice-enabled quizzes for all students</p>
                     </div>
 
-                    <!-- Card Body -->
                     <div class="card-body p-4">
 
-                        <!-- Title -->
-                        <h2 class="h5 text-center mb-4"
-                            id="auth-title">
-
+                        <!--
+                            ② Dynamic auth title
+                            • id="auth-title" is used by auth.js to swap
+                              "Welcome - Please Sign In" ↔ "Create an Account".
+                            • aria-live="polite" ensures screen readers
+                              announce the change without stealing focus when
+                              the user switches between Sign In and Register.
+                            • It is an <h2> (not <h3>) so it sits one level
+                              below the <h1> above — no heading levels skipped.
+                        -->
+                        <h2 class="text-center mb-4"
+                            id="auth-title"
+                            aria-live="polite">
                             Welcome — Please Sign In
-
                         </h2>
 
-                        <!-- Role Selection -->
-                        <section id="role-selection"
-                            class="mb-4"
-                            aria-label="Select user role">
+                        <!-- ③ Role Selection ──────────────────────────────
+                             The original markup uses plain <div>s with a
+                             data-role attribute, which are completely invisible
+                             to keyboard and screen-reader users. We replace
+                             them with <button> elements so they are:
+                               • Focusable natively (no tabindex hacks needed)
+                               • Announced as "button" by screen readers
+                               • Activatable with Space / Enter
+                               • Expressible as selected via aria-pressed
 
-                            <div class="row g-3">
+                             role="group" + aria-labelledby ties the two
+                             buttons together as a named group so screen
+                             readers announce "Select your role, group" when
+                             focus enters.
 
-                                <!-- Teacher -->
-                                <div class="col-6">
+                             aria-pressed="true/false" communicates the
+                             selected state. JS in auth.js must toggle this
+                             when a role is chosen.
 
-                                    <button type="button"
-                                        class="role-card w-100 text-center p-3 border rounded bg-white"
+                             aria-describedby on each button points to the
+                             small description text, so users hear the full
+                             context ("Teacher — Create and manage quizzes")
+                             not just the heading.
+                        -->
+                        <div id="role-selection"
+                             class="row mb-4"
+                             role="group"
+                             aria-labelledby="role-selection-label">
+
+                            <p id="role-selection-label"
+                               class="visually-hidden">
+                                Select your role
+                            </p>
+
+                            <div class="col-6">
+                                <button type="button"
+                                        class="role-card text-center p-3 w-100 border-0 bg-transparent"
                                         data-role="teacher"
-                                        aria-label="Select Teacher Role">
-
-                                        <i class="fas fa-chalkboard-teacher fa-2x text-primary mb-2"
-                                            aria-hidden="true"></i>
-
-                                        <h3 class="h6 mb-1">
-                                            Teacher
-                                        </h3>
-
-                                        <p class="small text-muted mb-0">
-                                            Create and manage quizzes
-                                        </p>
-
-                                    </button>
-
-                                </div>
-
-                                <!-- Student -->
-                                <div class="col-6">
-
-                                    <button type="button"
-                                        class="role-card w-100 text-center p-3 border rounded bg-white"
-                                        data-role="student"
-                                        aria-label="Select Student Role">
-
-                                        <i class="fas fa-user-graduate fa-2x text-primary mb-2"
-                                            aria-hidden="true"></i>
-
-                                        <h3 class="h6 mb-1">
-                                            Student
-                                        </h3>
-
-                                        <p class="small text-muted mb-0">
-                                            Take quizzes and view results
-                                        </p>
-
-                                    </button>
-
-                                </div>
-
+                                        aria-pressed="false"
+                                        aria-describedby="teacher-desc">
+                                    <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-3"
+                                       aria-hidden="true"></i>
+                                    <h3 class="h5 mb-1">Teacher</h3>
+                                    <p class="small text-muted mb-0" id="teacher-desc">
+                                        Create and manage quizzes
+                                    </p>
+                                </button>
                             </div>
 
-                        </section>
+                            <div class="col-6">
+                                <button type="button"
+                                        class="role-card text-center p-3 w-100 border-0 bg-transparent"
+                                        data-role="student"
+                                        aria-pressed="false"
+                                        aria-describedby="student-desc">
+                                    <i class="fas fa-user-graduate fa-3x text-primary mb-3"
+                                       aria-hidden="true"></i>
+                                    <h3 class="h5 mb-1">Student</h3>
+                                    <p class="small text-muted mb-0" id="student-desc">
+                                        Take quizzes and view results
+                                    </p>
+                                </button>
+                            </div>
 
-                        <!-- Authentication Form -->
+                        </div>
+
+                        <!-- ④ Auth Form ───────────────────────────────────
+                             • aria-label names the form landmark so it is
+                               distinguishable from any other forms on the
+                               page (e.g. search).
+                             • aria-live="polite" on the form means if auth.js
+                               injects an error summary inside it, screen
+                               readers will announce the new content.
+                             • novalidate: we provide custom accessible
+                               validation feedback rather than relying on
+                               native browser tooltips, which are not reliably
+                               read by all screen readers.
+                        -->
                         <form id="auth-form"
-                            aria-label="Authentication Form">
+                              aria-label="Sign in or register"
+                              aria-live="polite"
+                              novalidate>
 
                             <!-- Username -->
                             <div class="mb-3">
-
-                                <label for="username"
-                                    class="form-label">
-
+                                <label for="username" class="form-label">
                                     Username
-
+                                    <span aria-hidden="true" class="text-danger"> *</span>
                                 </label>
-
                                 <input type="text"
-                                    class="form-control"
-                                    id="username"
-                                    name="username"
-                                    autocomplete="username"
-                                    aria-required="true"
-                                    aria-label="Enter your username"
-                                    required>
-
+                                       class="form-control"
+                                       id="username"
+                                       name="username"
+                                       required
+                                       aria-required="true"
+                                       autocomplete="username"
+                                       aria-describedby="username-error">
+                                <!--
+                                    Error placeholder: hidden by default.
+                                    JS sets aria-invalid="true" on the input
+                                    and populates + unhides this <span> on
+                                    validation failure.
+                                -->
+                                <span id="username-error"
+                                      class="invalid-feedback"
+                                      role="alert"
+                                      aria-live="assertive">
+                                </span>
                             </div>
 
-                            <!-- Email -->
+                            <!-- Email (register only) ─────────────────────
+                                 • aria-hidden="true" when the group is hidden
+                                   removes it from the AT tree entirely, so
+                                   screen readers don't encounter invisible
+                                   fields.
+                                 • JS must toggle aria-hidden alongside
+                                   display: none / block.
+                                 • autocomplete="email" helps password managers
+                                   and autofill assistive technologies.
+                            -->
                             <div class="mb-3"
-                                id="email-group"
-                                style="display: none;">
-
-                                <label for="email"
-                                    class="form-label">
-
-                                    Email
-
-                                </label>
-
+                                 id="email-group"
+                                 style="display: none;"
+                                 aria-hidden="true">
+                                <label for="email" class="form-label">Email</label>
                                 <input type="email"
-                                    class="form-control"
-                                    id="email"
-                                    name="email"
-                                    autocomplete="email"
-                                    aria-label="Enter your email address">
-
+                                       class="form-control"
+                                       id="email"
+                                       name="email"
+                                       autocomplete="email"
+                                       aria-describedby="email-hint email-error">
+                                <div id="email-hint" class="form-text">
+                                    Used for account recovery only.
+                                </div>
+                                <span id="email-error"
+                                      class="invalid-feedback"
+                                      role="alert"
+                                      aria-live="assertive">
+                                </span>
                             </div>
 
                             <!-- Password -->
                             <div class="mb-3">
-
-                                <label for="password"
-                                    class="form-label">
-
+                                <label for="password" class="form-label">
                                     Password
-
+                                    <span aria-hidden="true" class="text-danger"> *</span>
                                 </label>
-
                                 <input type="password"
-                                    class="form-control"
-                                    id="password"
-                                    name="password"
-                                    autocomplete="current-password"
-                                    aria-required="true"
-                                    aria-label="Enter your password"
-                                    required>
-
+                                       class="form-control"
+                                       id="password"
+                                       name="password"
+                                       required
+                                       aria-required="true"
+                                       autocomplete="current-password"
+                                       aria-describedby="password-error">
+                                <span id="password-error"
+                                      class="invalid-feedback"
+                                      role="alert"
+                                      aria-live="assertive">
+                                </span>
                             </div>
 
-                            <!-- Confirm Password -->
+                            <!-- Confirm Password (register only) ───────────
+                                 Same aria-hidden toggle pattern as email-group.
+                                 autocomplete="new-password" signals to browsers
+                                 and AT that this is a new credential, not a
+                                 recall of an existing one.
+                            -->
                             <div class="mb-3"
-                                id="confirm-password-group"
-                                style="display: none;">
-
-                                <label for="confirm-password"
-                                    class="form-label">
-
+                                 id="confirm-password-group"
+                                 style="display: none;"
+                                 aria-hidden="true">
+                                <label for="confirm-password" class="form-label">
                                     Confirm Password
-
+                                    <span aria-hidden="true" class="text-danger"> *</span>
                                 </label>
-
                                 <input type="password"
-                                    class="form-control"
-                                    id="confirm-password"
-                                    name="confirm-password"
-                                    autocomplete="new-password"
-                                    aria-label="Confirm your password">
-
+                                       class="form-control"
+                                       id="confirm-password"
+                                       name="confirm-password"
+                                       autocomplete="new-password"
+                                       aria-describedby="confirm-password-error">
+                                <span id="confirm-password-error"
+                                      class="invalid-feedback"
+                                      role="alert"
+                                      aria-live="assertive">
+                                </span>
                             </div>
 
-                            <!-- Submit Button -->
+                            <!--
+                                ⑤ Submit button
+                                • aria-live="polite" on the button itself
+                                  is NOT correct here — the button label is
+                                  updated by auth.js ("Sign In" ↔ "Register").
+                                  Instead, give the button an id so JS can
+                                  update its text content directly; screen
+                                  readers will re-read the button label when
+                                  focus returns to it.
+                                • The icon is decorative — aria-hidden="true".
+                            -->
                             <button type="submit"
-                                class="btn btn-primary w-100"
-                                id="auth-submit-btn"
-                                aria-label="Submit authentication form">
-
-                                <i class="fas fa-sign-in-alt"
-                                    aria-hidden="true"></i>
-
-                                Sign In
-
+                                    class="btn btn-primary w-100"
+                                    id="auth-submit-btn"
+                                    aria-label="Sign in to your account">
+                                <i class="fas fa-sign-in-alt" aria-hidden="true"></i>
+                                <span id="auth-submit-label">Sign In</span>
                             </button>
 
                         </form>
 
-                        <!-- Toggle -->
+                        <!--
+                            ⑥ Toggle between Sign In and Register
+                            • type="button" prevents accidental form
+                              submission if this ever ends up inside a <form>.
+                            • aria-controls="auth-form" communicates which
+                              region this button affects.
+                            • aria-expanded reflects whether the "full"
+                              registration form (with email + confirm password)
+                              is currently visible. JS must keep this in sync.
+                            • The text content is itself the accessible name —
+                              no separate aria-label needed since it is
+                              descriptive enough.
+                        -->
                         <div class="text-center mt-3">
-
                             <button type="button"
-                                class="btn btn-link text-decoration-none"
-                                id="auth-toggle-btn"
-                                aria-label="Switch between login and registration">
-
+                                    class="btn btn-link"
+                                    id="auth-toggle-btn"
+                                    aria-controls="auth-form"
+                                    aria-expanded="false">
                                 Don't have an account? Register here
-
                             </button>
-
                         </div>
 
-                    </div>
+                    </div><!-- /.card-body -->
+                </div><!-- /.card -->
 
-                </div>
-
-                <!-- Demo Accounts -->
-                <section class="card border-0 shadow-sm mt-3"
-                    aria-label="Demo account credentials">
-
+                <!-- ⑦ Demo Accounts Info Card ───────────────────────────
+                     • <aside> semantically marks this as complementary
+                       content — supplementary to the main form but not
+                       part of it.
+                     • aria-label names the aside landmark so screen-reader
+                       users can find it in the landmark list.
+                     • The credentials are in a <dl> (description list) so
+                       screen readers expose the term–value relationship:
+                       "Teacher, definition, demo_teacher / demo123".
+                     • The info icon is decorative.
+                -->
+                <aside class="card mt-3 bg-light"
+                       aria-label="Demo account credentials">
                     <div class="card-body">
-
                         <h2 class="h6 card-title">
-
-                            <i class="fas fa-info-circle"
-                                aria-hidden="true"></i>
-
+                            <i class="fas fa-info-circle" aria-hidden="true"></i>
                             Demo Accounts
-
                         </h2>
-
-                        <div class="small">
-
-                            <p class="mb-1">
-
-                                <strong>Teacher:</strong>
-                                demo_teacher / demo123
-
-                            </p>
-
-                            <p class="mb-0">
-
-                                <strong>Student:</strong>
-                                demo_student / demo123
-
-                            </p>
-
-                        </div>
-
+                        <dl class="small mb-0">
+                            <dt>Teacher</dt>
+                            <dd>
+                                <span class="visually-hidden">Username:</span>
+                                demo_teacher
+                                <span class="visually-hidden">, Password:</span>
+                                / demo123
+                            </dd>
+                            <dt>Student</dt>
+                            <dd>
+                                <span class="visually-hidden">Username:</span>
+                                demo_student
+                                <span class="visually-hidden">, Password:</span>
+                                / demo123
+                            </dd>
+                        </dl>
                     </div>
+                </aside>
 
-                </section>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section>
-
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</div><!-- /.auth-container -->
 {% endblock %}
 
+
 {% block extra_js %}
+<script>
+    /*
+        ⑧ JS hooks for auth.js to call when toggling Sign In ↔ Register
+        ─────────────────────────────────────────────────────────────────
+        These helpers centralise all the accessibility state changes so
+        auth.js doesn't have to know ARIA attribute names.
+    */
+
+    /**
+     * Show or hide a conditionally-visible field group
+     * (email-group, confirm-password-group).
+     * Keeps display and aria-hidden in sync.
+     *
+     * @param {string} groupId  - The element id
+     * @param {boolean} visible - true = show, false = hide
+     */
+    window.setFieldGroupVisible = function(groupId, visible) {
+        const group = document.getElementById(groupId);
+        if (!group) return;
+        group.style.display = visible ? 'block' : 'none';
+        group.setAttribute('aria-hidden', String(!visible));
+
+        // Clear any stale validation state when hiding
+        if (!visible) {
+            const input = group.querySelector('input');
+            if (input) {
+                input.removeAttribute('aria-invalid');
+                input.value = '';
+            }
+            const error = group.querySelector('[role="alert"]');
+            if (error) error.textContent = '';
+        }
+    };
+
+    /**
+     * Switch the form between Sign In and Register modes.
+     * Call this from auth.js when #auth-toggle-btn is clicked.
+     *
+     * @param {boolean} isRegister - true = Register mode
+     */
+    window.setAuthMode = function(isRegister) {
+        // Update page title
+        const title = document.getElementById('auth-title');
+        if (title) title.textContent = isRegister ? 'Create an Account' : 'Welcome — Please Sign In';
+
+        // Update submit button label and aria-label
+        const submitLabel = document.getElementById('auth-submit-label');
+        const submitBtn   = document.getElementById('auth-submit-btn');
+        if (submitLabel) submitLabel.textContent = isRegister ? 'Register' : 'Sign In';
+        if (submitBtn)   submitBtn.setAttribute('aria-label', isRegister ? 'Create your account' : 'Sign in to your account');
+
+        // Update toggle button state
+        const toggleBtn = document.getElementById('auth-toggle-btn');
+        if (toggleBtn) {
+            toggleBtn.setAttribute('aria-expanded', String(isRegister));
+            toggleBtn.textContent = isRegister
+                ? 'Already have an account? Sign in here'
+                : "Don't have an account? Register here";
+        }
+
+        // Show / hide conditional fields
+        window.setFieldGroupVisible('email-group', isRegister);
+        window.setFieldGroupVisible('confirm-password-group', isRegister);
+
+        // Update autocomplete on password field for new vs existing credential
+        const passwordInput = document.getElementById('password');
+        if (passwordInput) {
+            passwordInput.setAttribute('autocomplete', isRegister ? 'new-password' : 'current-password');
+        }
+    };
+
+    /**
+     * Mark a field as invalid with a descriptive message.
+     * Call this from auth.js validation logic.
+     *
+     * @param {string} fieldId - Input element id
+     * @param {string} message - Error message to display and announce
+     */
+    window.setFieldError = function(fieldId, message) {
+        const input = document.getElementById(fieldId);
+        const error = document.getElementById(fieldId + '-error');
+        if (input) input.setAttribute('aria-invalid', 'true');
+        if (error) {
+            error.textContent = message;
+            error.style.display = 'block';
+        }
+    };
+
+    /**
+     * Clear a field's error state.
+     *
+     * @param {string} fieldId - Input element id
+     */
+    window.clearFieldError = function(fieldId) {
+        const input = document.getElementById(fieldId);
+        const error = document.getElementById(fieldId + '-error');
+        if (input) input.removeAttribute('aria-invalid');
+        if (error) {
+            error.textContent = '';
+            error.style.display = 'none';
+        }
+    };
+
+    /**
+     * Sync aria-pressed on role cards when a role is selected.
+     * Call this from auth.js when a role-card button is clicked.
+     *
+     * @param {string} selectedRole - 'teacher' or 'student'
+     */
+    window.setSelectedRole = function(selectedRole) {
+        document.querySelectorAll('[data-role]').forEach(btn => {
+            const isSelected = btn.dataset.role === selectedRole;
+            btn.setAttribute('aria-pressed', String(isSelected));
+        });
+    };
+</script>
 
 <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
-
 {% endblock %}
