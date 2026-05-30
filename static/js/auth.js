@@ -21,7 +21,7 @@ function setupRoleSelection() {
             this.classList.add('selected');
             currentRole = this.dataset.role;
             
-            const roleTitle = this.querySelector('h5').textContent;
+            const roleTitle = this.querySelector('h3').textContent;
             speakText(roleTitle + ' role selected');
         });
     });

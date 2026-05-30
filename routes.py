@@ -1,4 +1,3 @@
-import json
 from flask import Blueprint, render_template, request, jsonify, session, redirect, url_for
 from extensions import db
 from models import User, Quiz, Question, QuizResult
@@ -229,7 +228,7 @@ def submit_quiz(quiz_id):
         score=score,
         total_questions=total,
         percentage=percentage,
-        answers=json.dumps(detailed_answers)
+        answers=detailed_answers
     )
     db.session.add(result)
     db.session.commit()
@@ -274,7 +273,7 @@ def get_results():
             'total': r.total_questions,
             'percentage': r.percentage,
             'completed_at': r.completed_at.isoformat(),
-            'answers': json.loads(r.answers)
+            'answers': r.answers
         } for r in results]
 
     return jsonify({'success': True, 'results': results_data})

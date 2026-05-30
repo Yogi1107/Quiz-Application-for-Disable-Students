@@ -5,6 +5,7 @@ let recognition = null;
 let isListening = false;
 let awaitingNextConfirmation = false;
 let optionSubmitted = false;
+let recognitionActive = false;
 
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
@@ -27,36 +28,114 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Initialize speech recognition
 function initSpeechRecognition() {
-    if ('webkitSpeechRecognition' in window) {
-        recognition = new webkitSpeechRecognition();
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
-        
-        recognition.onresult = function(event) {
-            const transcript = event.results[0][0].transcript.toLowerCase().trim();
-            processVoiceCommand(transcript);
-            document.getElementById('listening-indicator').style.display = 'none';
-        };
-        
-        recognition.onend = function() {
-            if (isListening) {
-                setTimeout(() => recognition.start(), 100);
-            }
-        };
-        
-        recognition.onerror = function(event) {
-            console.error('Speech recognition error', event.error);
-            document.getElementById('listening-indicator').style.display = 'none';
-            
-            if (isListening && event.error !== 'aborted') {
-                setTimeout(() => recognition.start(), 1000);
-            }
-        };
-    } else {
+
+    const SpeechRecognition =
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
         console.warn('Speech recognition is not supported in this browser');
+        return;
     }
+
+    recognition = new SpeechRecognition();
+
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.lang = 'en-US';
+
+    recognition.onstart = function () {
+        recognitionActive = true;
+        console.log('Speech recognition started');
+
+        const indicator = document.getElementById('listening-indicator');
+        if (indicator) {
+            indicator.style.display = 'block';
+        }
+    };
+
+    recognition.onresult = function (event) {
+
+        const transcript = event.results[0][0].transcript
+            .toLowerCase()
+            .trim();
+
+        console.log('Voice command:', transcript);
+
+        processVoiceCommand(transcript);
+    };
+
+    recognition.onend = function () {
+
+        recognitionActive = false;
+
+        const indicator = document.getElementById('listening-indicator');
+        if (indicator) {
+            indicator.style.display = 'none';
+        }
+
+        console.log('Speech recognition ended');
+
+        // Restart only if quiz is active and user wants listening
+        if (isListening) {
+
+            setTimeout(() => {
+
+                if (!recognitionActive) {
+
+                    try {
+                        recognition.start();
+                    }
+                    catch (err) {
+                        console.error('Restart failed:', err);
+                    }
+
+                }
+
+            }, 500);
+        }
+    };
+
+    recognition.onerror = function (event) {
+
+        console.error('Speech recognition error:', event.error);
+
+        recognitionActive = false;
+
+        const indicator = document.getElementById('listening-indicator');
+        if (indicator) {
+            indicator.style.display = 'none';
+        }
+
+        switch (event.error) {
+
+            case 'audio-capture':
+                console.error('No microphone detected');
+                speakText('Microphone not detected. Please connect a microphone and try again.');
+                isListening = false;
+                break;
+
+            case 'not-allowed':
+                console.error('Microphone permission denied');
+                speakText('Microphone permission was denied.');
+                isListening = false;
+                break;
+
+            case 'service-not-allowed':
+                console.error('Speech service not allowed');
+                isListening = false;
+                break;
+
+            case 'aborted':
+                console.log('Recognition aborted');
+                break;
+
+            default:
+                console.warn('Speech recognition error:', event.error);
+        }
+    };
 }
+
 
 // Process voice commands
 function processVoiceCommand(command) {
@@ -111,24 +190,59 @@ function speakOptions() {
 
 // Start listening
 function startListening() {
-    if (recognition) {
-        isListening = true;
-        document.getElementById('listening-indicator').style.display = 'block';
+
+    if (!recognition) {
+        return;
+    }
+
+    isListening = true;
+
+    const indicator = document.getElementById('listening-indicator');
+    if (indicator) {
+        indicator.style.display = 'block';
+    }
+
+    if (!recognitionActive) {
+
         try {
+
             recognition.start();
+
         } catch (error) {
-            console.error('Failed to start speech recognition:', error);
-            document.getElementById('listening-indicator').style.display = 'none';
+
+            console.error(
+                'Failed to start speech recognition:',
+                error
+            );
+
         }
     }
 }
 
 // Stop listening
 function stopListening() {
-    if (recognition) {
-        isListening = false;
-        document.getElementById('listening-indicator').style.display = 'none';
-        recognition.stop();
+
+    isListening = false;
+
+    const indicator = document.getElementById('listening-indicator');
+    if (indicator) {
+        indicator.style.display = 'none';
+    }
+
+    if (recognition && recognitionActive) {
+
+        try {
+
+            recognition.stop();
+
+        } catch (error) {
+
+            console.error(
+                'Failed to stop speech recognition:',
+                error
+            );
+
+        }
     }
 }
 
