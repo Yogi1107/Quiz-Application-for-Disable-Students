@@ -1,324 +1,199 @@
 # ExamVoice — Accessible Exam Platform for Visually Impaired Students
 
+![Python](https://img.shields.io/badge/Python-3.10+-blue?logo=python)
+![Flask](https://img.shields.io/badge/Flask-3.0-black?logo=flask)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15+-blue?logo=postgresql)
+![License](https://img.shields.io/badge/License-MIT-green)
+![Accessibility](https://img.shields.io/badge/WCAG-2.1%20AA-blueviolet)
+
 ## The Problem
-In India, blind students taking exams rely on human writers. 
-When a writer leaves mid-exam, the student cannot complete their paper. 
-This project gives blind students autonomy over their own assessments.
+
+In India, blind students taking exams rely on human writers (scribes). When a scribe leaves mid-exam, the student cannot complete their paper. ExamVoice gives blind and visually impaired students full autonomy over their own assessments — no scribe required.
 
 ## Features
-- Full voice command navigation (Chrome) + keyboard shortcuts (all browsers)
-- Screen reader compatible with ARIA live regions
-- Teacher dashboard with performance analytics
-- Timed exam mode
-- Works on any device with a browser
+
+| Feature | Details |
+|---|---|
+| 🎙️ Voice navigation | Full voice command control via Web Speech API (Chrome) |
+| ⌨️ Keyboard shortcuts | Works across all browsers without voice |
+| ♿ Screen reader support | ARIA live regions, skip links, semantic landmarks (WCAG 2.1 AA) |
+| 👩‍🏫 Teacher dashboard | Create quizzes, view results, track student performance |
+| 🎓 Student dashboard | Browse and take quizzes, review detailed results |
 
 ## Project Structure
+
 ```
-quiz_platform/
+examvoice/
 │
-├── app.py                 # Main Flask application
+├── app.py                 # Application factory
+├── extensions.py          # SQLAlchemy db instance
+├── demo_accounts.py       # demo_accounts to be created
+├── models.py              # Database models
+├── routes.py              # All route handlers (Blueprint)
 ├── requirements.txt       # Python dependencies
-├── .env                   # Environment variables (create this)
+├── .env                   # Environment variable template
 │
 ├── templates/
-│   ├── base.html         # Base template
-│   ├── index.html        # Login/Registration page
-│   └── dashboard.html    # Dashboard for teachers/students
+│   ├── base.html          # Base template with accessibility infrastructure
+│   ├── index.html         # Login / registration page
+│   └── dashboard.html     # Role-aware dashboard (teacher / student)
 │
 └── static/
     ├── css/
-    │   └── style.css     # Custom styles
+    │   └── style.css      # Custom styles
     └── js/
-        ├── main.js       # Common JavaScript functions
-        ├── auth.js       # Authentication logic
-        ├── teacher.js    # Teacher dashboard logic
-        └── student.js    # Student dashboard logic
+        ├── main.js        # Shared utilities (toast, fetch wrapper, TTS)
+        ├── auth.js        # Login and registration logic
+        ├── teacher.js     # Teacher dashboard interactions
+        └── student.js     # Student quiz-taking and voice commands
 ```
 
-## Requirements (requirements.txt)
+## Tech Stack
 
-```
-Flask==3.0.0
-Flask-SQLAlchemy==3.1.1
-psycopg2-binary==2.9.9
-python-dotenv==1.0.0
-Werkzeug==3.0.1
-```
+- **Backend:** Python 3.10+, Flask 3.0, Flask-SQLAlchemy
+- **Database:** PostgreSQL 15+ (JSONB for quiz answers, GIN index for fast querying)
+- **Frontend:** Bootstrap 5, Vanilla JS, Web Speech API
+- **Auth:** Session-based with Werkzeug password hashing
 
-## Environment Variables (.env)
+## Getting Started
 
-Create a `.env` file in the project root:
+### Prerequisites
 
-```env
-SECRET_KEY=your-secret-key-here-change-this-in-production
-DATABASE_URL=postgresql://username:password@localhost:5432/quiz_platform
-```
+- Python 3.10+
+- PostgreSQL 15+
 
-## PostgreSQL Database Setup
-
-### 1. Install PostgreSQL
-
-**Ubuntu/Debian:**
-```bash
-sudo apt update
-sudo apt install postgresql postgresql-contrib
-```
-
-**macOS (using Homebrew):**
-```bash
-brew install postgresql
-brew services start postgresql
-```
-
-**Windows:**
-Download and install from https://www.postgresql.org/download/windows/
-
-### 2. Create Database and User
+### 1. Clone the repository
 
 ```bash
-# Access PostgreSQL
-sudo -u postgres psql
-
-# Inside PostgreSQL shell:
-CREATE DATABASE quiz_platform;
-CREATE USER quiz_user WITH PASSWORD 'your_password_here';
-GRANT ALL PRIVILEGES ON DATABASE quiz_platform TO quiz_user;
-
-# For PostgreSQL 15+, also run:
-\c quiz_platform
-GRANT ALL ON SCHEMA public TO quiz_user;
-
-\q
+git clone https://github.com/your-username/examvoice.git
+cd examvoice
 ```
 
-### 3. Update DATABASE_URL in .env
-
-```env
-DATABASE_URL=postgresql://quiz_user:your_password_here@localhost:5432/quiz_platform
-```
-
-## Installation Steps
-
-### 1. Clone or Create Project Directory
+### 2. Set up a virtual environment
 
 ```bash
-mkdir quiz_platform
-cd quiz_platform
-```
-
-### 2. Create Virtual Environment
-
-```bash
-# Create virtual environment
 python3 -m venv venv
-
-# Activate virtual environment
-# On Linux/Mac:
-source venv/bin/activate
-
-# On Windows:
-venv\Scripts\activate
+source venv/bin/activate        # Linux / macOS
+# venv\Scripts\activate         # Windows
 ```
 
-### 3. Install Dependencies
+### 3. Install dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Create Directory Structure
+### 4. Configure environment variables
 
 ```bash
-mkdir -p templates static/css static/js
+cp .env.example .env
 ```
 
-### 5. Create All Files
+Edit `.env` with your values:
 
-Place the following files in their respective locations:
-- `app.py` in the root directory
-- HTML files in `templates/`
-- CSS in `static/css/`
-- JavaScript files in `static/js/`
-- `.env` with your database credentials
-
-### 6. Initialize Database
-
-The application will automatically create tables on first run. Alternatively, you can do it manually:
-
-```python
-from app import app, db
-
-with app.app_context():
-    db.create_all()
-    print("Database tables created successfully!")
+```env
+SECRET_KEY=change-this-to-a-long-random-string
+DATABASE_URL=postgresql://quiz_user:your_password@localhost:5432/examvoice
 ```
 
-### 7. Create Demo Accounts (Optional)
+> ⚠️ Never commit `.env` to version control. It is listed in `.gitignore`.
 
-```python
-from app import app, db, User
-from werkzeug.security import generate_password_hash
-
-with app.app_context():
-    # Create demo teacher
-    teacher = User(
-        username='demo_teacher',
-        email='teacher@demo.com',
-        role='teacher'
-    )
-    teacher.set_password('demo123')
-    
-    # Create demo student
-    student = User(
-        username='demo_student',
-        email='student@demo.com',
-        role='student'
-    )
-    student.set_password('demo123')
-    
-    db.session.add(teacher)
-    db.session.add(student)
-    db.session.commit()
-    
-    print("Demo accounts created!")
-```
-
-## Running the Application
-
-### Development Mode
+### 5. Set up PostgreSQL
 
 ```bash
-# Make sure virtual environment is activated
+sudo -u postgres psql
+```
+
+```sql
+CREATE DATABASE examvoice;
+CREATE USER quiz_user WITH PASSWORD 'your_password';
+GRANT ALL PRIVILEGES ON DATABASE examvoice TO quiz_user;
+
+-- PostgreSQL 15+ only:
+\c examvoice
+GRANT ALL ON SCHEMA public TO quiz_user;
+\q
+```
+
+### 6. Run the application
+
+```bash
 python app.py
 ```
 
-The application will be available at: http://127.0.0.1:5000/
+Visit: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 
-### Production Mode
+## Demo Accounts
 
-For production, use a WSGI server like Gunicorn:
+> ⚠️ These are for local development only. Remove or change credentials before any deployment.
+
+| Role | Username | Password |
+|---|---|---|
+| Teacher | `demo_teacher` | `demo123` |
+| Student | `demo_student` | `demo123` |
+
+To create them, run:
 
 ```bash
-# Install Gunicorn
-pip install gunicorn
-
-# Run with Gunicorn
-gunicorn -w 4 -b 0.0.0.0:8000 app:app
+python seed.py
 ```
 
-## Usage
+## Voice Commands (Student Mode)
 
-### Demo Accounts
-- **Teacher:** 
-  - Username: `demo_teacher`
-  - Password: `demo123`
-  
-- **Student:**
-  - Username: `demo_student`
-  - Password: `demo123`
+| Command | Action |
+|---|---|
+| `"Repeat question"` | Re-reads the current question |
+| `"Repeat options"` | Re-reads all four answer options |
+| `"Option A/B/C/D"` | Selects that answer |
+| `"Yes"` | Confirms and moves to next question |
+| `"No"` | Stays on current question |
 
-### Features
-
-**For Teachers:**
-1. Create quizzes with multiple-choice questions
-2. Manage existing quizzes (view, delete)
-3. View student results and statistics
-
-**For Students:**
-1. Browse available quizzes
-2. Take quizzes with voice commands or mouse clicks
-3. View quiz results and detailed answers
-
-### Voice Commands (Student Mode)
-- "Repeat question" - Repeats the current question
-- "Repeat options" - Repeats all answer options
-- "Option A/B/C/D" - Selects an answer
-- "Yes" - Proceeds to next question
-- "No" - Stays on current question
+> Voice commands require Chrome or a Chromium-based browser. All functions are also available via keyboard and mouse.
 
 ## Database Schema
 
-### Users Table
-- `id` (Primary Key)
-- `username` (Unique)
-- `email` (Unique)
-- `password_hash`
-- `role` (teacher/student)
-- `created_at`
+```
+users          → id, username, email, password_hash, role, created_at
+quizzes        → id, title, description, created_by (FK), created_at
+questions      → id, quiz_id (FK), question_text, option_a–d, correct_answer, order_num
+quiz_results   → id, quiz_id (FK), student_id (FK), score, total_questions, percentage, answers (JSONB), completed_at
+```
 
-### Quizzes Table
-- `id` (Primary Key)
-- `title`
-- `description`
-- `created_by` (Foreign Key → Users)
-- `created_at`
+## Production Deployment
 
-### Questions Table
-- `id` (Primary Key)
-- `quiz_id` (Foreign Key → Quizzes)
-- `question_text`
-- `option_a`, `option_b`, `option_c`, `option_d`
-- `correct_answer` (A/B/C/D)
-- `order_num`
+Use Gunicorn behind a reverse proxy (e.g. Nginx):
 
-### Quiz Results Table
-- `id` (Primary Key)
-- `quiz_id` (Foreign Key → Quizzes)
-- `student_id` (Foreign Key → Users)
-- `score`
-- `total_questions`
-- `percentage`
-- `answers` (JSON)
-- `completed_at`
+```bash
+pip install gunicorn
+gunicorn -w 4 -b 0.0.0.0:8000 app:app
+```
+
+Key production checklist:
+- [ ] Set a strong `SECRET_KEY`
+- [ ] Enable HTTPS via Nginx / Caddy
+- [ ] Set `debug=False`
+- [ ] Add rate limiting (e.g. Flask-Limiter)
+- [ ] Rotate demo credentials or remove them entirely
 
 ## Troubleshooting
 
-### Database Connection Issues
-
+**PostgreSQL not connecting**
 ```bash
-# Check if PostgreSQL is running
 sudo systemctl status postgresql
-
-# Restart PostgreSQL
 sudo systemctl restart postgresql
 ```
 
-### Port Already in Use
-
+**Port 5000 in use**
 ```bash
-# Find process using port 5000
 lsof -i :5000
-
-# Kill the process
 kill -9 <PID>
 ```
 
-### Module Import Errors
-
+**Import errors**
 ```bash
-# Reinstall dependencies
 pip install --upgrade -r requirements.txt
 ```
 
-## Security Notes
-
-1. **Change SECRET_KEY:** Use a strong, random secret key in production
-2. **Database Credentials:** Never commit `.env` file to version control
-3. **HTTPS:** Use HTTPS in production (configure through reverse proxy like Nginx)
-4. **Input Validation:** The app includes basic validation, but add more for production
-5. **Rate Limiting:** Consider adding Flask-Limiter for API rate limiting
-
-## Future Enhancements
-
-- Quiz editing functionality
-- Time limits for quizzes
-- Question types (true/false, fill-in-the-blank)
-- Quiz categories and tags
-- Student progress tracking
-- Export results to CSV/PDF
-- Email notifications
-- Admin dashboard
-
 ## License
 
-MIT License - Feel free to use and modify for your needs.
+[MIT](LICENSE)
