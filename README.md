@@ -8,7 +8,13 @@
 
 ## The Problem
 
-In India, blind students taking exams rely on human writers (scribes). When a scribe leaves mid-exam, the student cannot complete their paper. ExamVoice gives blind and visually impaired students full autonomy over their own assessments — no scribe required.
+## The Problem
+
+During my graduation, I used to write exams for visually impaired students appearing for higher secondary examinations. In most cases the experience was cooperative — but I also witnessed moments where communication broke down, students were left waiting, or the level of assistance fell short of what they needed.
+
+What struck me most was how completely a student's performance depended on another person being present, patient, and attentive.
+
+ExamVoice is my attempt to answer that question.
 
 ## Features
 
@@ -19,6 +25,14 @@ In India, blind students taking exams rely on human writers (scribes). When a sc
 | ♿ Screen reader support | ARIA live regions, skip links, semantic landmarks (WCAG 2.1 AA) |
 | 👩‍🏫 Teacher dashboard | Create quizzes, view results, track student performance |
 | 🎓 Student dashboard | Browse and take quizzes, review detailed results |
+
+## Screenshots
+
+<img src="assets/Login_Register.png" alt="Login page with Teacher and Student role selection cards" width="700">
+
+<img src="assets/teacher_dashboard.png" alt="Teacher dashboard showing quiz list and student result analytics" width="700">
+
+<img src="assets/student_dashboard.png" alt="Student quiz view showing voice command indicator and multiple choice options" width="700">
 
 ## Project Structure
 
