@@ -149,7 +149,7 @@ Visit: [http://127.0.0.1:5000](http://127.0.0.1:5000)
 To create them, run:
 
 ```bash
-python seed.py
+python demo_accounts.py
 ```
 
 ## Voice Commands (Student Mode)
